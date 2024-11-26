@@ -1,6 +1,8 @@
 const bcrypt = require('bcryptjs');
 const options = require('../utils/jwt');
 const User = require('../models/userModel');
+const { sendLoginEmail, sendLogoutEmail } = require('../utils/emailService');
+const { generateSessionId } = require('../utils/sessionUtils');
 
 class AuthController {
   // Register a new user
@@ -33,30 +35,43 @@ class AuthController {
   };
 
   // Admin or user login
+
   loginUser = async (req, res, next) => {
     try {
-      const { email, password } = req.body;
-
-      // Find user by email and select password
+      const { email, password, deviceName } = req.body;
+  
+      // Find user by email and validate password
       const user = await User.findOne({ email }).select('+password');
-      if (!user) {
+      const isMatch = (await bcrypt.compare(password, user.password))
+
+      if (!user || !isMatch) {
         return res.status(401).json({ message: 'Invalid email or password' });
       }
-
-      // Compare provided password with hashed password
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        return res.status(401).json({ message: 'Invalid email or password' });
+  
+      // Handle active session logout
+      try {
+        if (user.session && user.session.sessionId) {
+          await sendLogoutEmail(user.email, user.session.deviceName);
+        }
+      } catch (emailError) {
+        console.error('Logout email error:', emailError.message);
       }
-
-      // Generate a JWT token
-      const token = options(user._id,res);
-
-      
+  
+      // Update session and save user
+      user.session = { deviceName, sessionId: generateSessionId() };
+      await user.save();
+  
+      // Pass the user object to the options function
+      options(user, res);
+  
+      sendLoginEmail(user.email, deviceName).catch((emailError) =>
+        console.error('Login email error:', emailError.message)
+      );
     } catch (error) {
       next(error);
     }
   };
+
 }
 
 module.exports = new AuthController();

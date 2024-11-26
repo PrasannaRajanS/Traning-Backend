@@ -33,6 +33,10 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    session: {
+      deviceName: String,
+      sessionId: String, // You can use a unique identifier for the session
+    },
   },
   { timestamps: true }
 );

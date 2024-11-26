@@ -2,25 +2,31 @@ const jwt = require('jsonwebtoken');
 
 // Function to generate a JWT token
 const generateToken = (userId) => {
-  return jwt.sign({ id:userId}, process.env.JWT_SECRET, process.env.COOKIE_EXPIRES_TIME); // expires in 1 days
-
+  return jwt.sign(
+    { id: userId },
+    process.env.JWT_SECRET,
+    { expiresIn: `${process.env.COOKIE_EXPIRES_TIME}d` } // Token expiration time
+  );
 };
 
-const options = (userId,res) => {
-  token = generateToken(userId)
-  const options = {
-    expires: new Date(Date.now() + process.env.COOKIE_EXPIRES_TIME*24*60*60*1000),
-    httpOnly:true,
-    sameSite:'none',
-    secure:true,
-    maxAge:24*60*60*1000
-}
+const options = (user, res) => {
+  const token = generateToken(user._id); // This will Generate JWT token
+  const cookieOptions = {
+    expires: new Date(Date.now() + process.env.COOKIE_EXPIRES_TIME * 24 * 60 * 60 * 1000),
+    httpOnly: true,
+    sameSite: 'none',
+    secure: true,
+    maxAge: 24 * 60 * 60 * 1000, // 1 day
+  };
 
-res.status(200)
-      .cookie("token",token,options)
-      .json({
-        message: 'Login successful',
-      });
-}
+  // Send the response with the token and user details
+  res.cookie('token', token, cookieOptions).status(200).json({
+    message: 'Login successful',
+    name: user.name, 
+    role: user.role
+  });
+
+  return token; 
+};
 
 module.exports = options;
