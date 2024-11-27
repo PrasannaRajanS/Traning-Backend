@@ -22,11 +22,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "Password is required"],
       minlength: 6,
-      select: false, // Excludes password from queries by default
+      select: false,
     },
     role: {
       type: String,
-      enum: ["admin", "teacher", "student"],
+      enum: ["teacher", "student"],
       default: "student",
     },
     isActive: {
@@ -35,7 +35,7 @@ const userSchema = new mongoose.Schema(
     },
     session: {
       deviceName: String,
-      sessionId: String, // You can use a unique identifier for the session
+      sessionId: String, 
     },
   },
   { timestamps: true }

@@ -5,18 +5,16 @@ const { sendLoginEmail, sendLogoutEmail } = require('../utils/emailService');
 const { generateSessionId } = require('../utils/sessionUtils');
 
 class AuthController {
-  // Register a new user
+  
   createUser = async (req, res, next) => {
     try {
       const { name, email, password } = req.body;
 
-      // Check if the email is already registered
       const existingUser = await User.findOne({ email });
       if (existingUser) {
         return res.status(400).json({ message: 'Email is already in use' });
       }
 
-      // Create a new user
       const newUser = new User({ name, email, password });
       await newUser.save();
 
@@ -34,13 +32,10 @@ class AuthController {
     }
   };
 
-  // Admin or user login
-
   loginUser = async (req, res, next) => {
     try {
       const { email, password, deviceName } = req.body;
   
-      // Find user by email and validate password
       const user = await User.findOne({ email }).select('+password');
       const isMatch = (await bcrypt.compare(password, user.password))
 
@@ -48,7 +43,6 @@ class AuthController {
         return res.status(401).json({ message: 'Invalid email or password' });
       }
   
-      // Handle active session logout
       try {
         if (user.session && user.session.sessionId) {
           await sendLogoutEmail(user.email, user.session.deviceName);
@@ -57,11 +51,10 @@ class AuthController {
         console.error('Logout email error:', emailError.message);
       }
   
-      // Update session and save user
-      user.session = { deviceName, sessionId: generateSessionId() };
+      user.session = { deviceName, sessionId: generateSessionId() }; // Update session and save user
       await user.save();
   
-      // Pass the user object to the options function
+      // Passing the user object to the options function
       options(user, res);
   
       sendLoginEmail(user.email, deviceName).catch((emailError) =>

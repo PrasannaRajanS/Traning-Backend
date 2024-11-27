@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
-const auth = require('./routers/authRoutes')
+const router = require('./routers/router')
 const app = express();
 
 const errorHandler = require('./middleware/errorHandling');
@@ -14,7 +14,8 @@ app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
-app.use('/api',auth)
+
+app.use('/api',router)
 
 mongoose.set('strictQuery', false);
 
