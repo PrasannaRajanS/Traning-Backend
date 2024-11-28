@@ -64,12 +64,13 @@ class ProductCatalogController {
     }
 
     deleteProduct = async (req, res, next) => {
-        const { id } = req.params;
+        const { productId } = req.params;
         try {
-            const deletedProduct = await ProductCatalog.findByIdAndDelete(id);
-            if (!deletedProduct) {
-                return res.status(404).json({ error: 'Product not found' });
-            }
+            const updatedProduct = await ProductCatalog.findOneAndUpdate(
+                { _id: productId }, 
+                { $set: { isActive: false } }, 
+                { new: true } 
+            );
             res.status(204).json({ message: 'Deleted Successfully' });
         } catch (error) {
             next(error);
