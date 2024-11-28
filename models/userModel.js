@@ -35,7 +35,7 @@ const userSchema = new mongoose.Schema(
     },
     session: {
       deviceName: String,
-      sessionId: String, 
+      sessionId: String,
     },
   },
   { timestamps: true }

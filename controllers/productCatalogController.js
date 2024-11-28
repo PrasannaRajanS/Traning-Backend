@@ -6,7 +6,7 @@ class ProductCatalogController {
 
         try {
             const lastProduct = await ProductCatalog.findOne({}, {}, { sort: { createdAt: -1 } });
-            let nextProductId = 'PD0001'; 
+            let nextProductId = 'PD0001';
 
             if (lastProduct) {
                 const lastId = parseInt(lastProduct.productId.replace('PD', ''));
@@ -16,13 +16,13 @@ class ProductCatalogController {
 
             const product = new ProductCatalog({
                 ...req.body,
-                productId: nextProductId 
+                productId: nextProductId
             });
 
             const savedProduct = await product.save();
-            res.status(201).json({savedProduct, message: 'Product data create successfully'});
+            res.status(201).json({ message: 'Create Successfully' });
         } catch (error) {
-            next(error); 
+            next(error);
         }
     }
 
@@ -32,7 +32,7 @@ class ProductCatalogController {
             const products = await ProductCatalog.find({});
             res.json(products);
         } catch (error) {
-            next(error); 
+            next(error);
         }
 
     }
@@ -46,7 +46,7 @@ class ProductCatalogController {
             }
             res.json(product);
         } catch (error) {
-            next(error); 
+            next(error);
         }
     }
 
@@ -59,7 +59,7 @@ class ProductCatalogController {
             }
             res.json(updatedProduct);
         } catch (error) {
-            next(error); 
+            next(error);
         }
     }
 
@@ -70,9 +70,9 @@ class ProductCatalogController {
             if (!deletedProduct) {
                 return res.status(404).json({ error: 'Product not found' });
             }
-            res.status(204).send(); 
+            res.status(204).json({ message: 'Deleted Successfully' });
         } catch (error) {
-            next(error); 
+            next(error);
         }
     }
 }
