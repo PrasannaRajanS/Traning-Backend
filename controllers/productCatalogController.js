@@ -20,7 +20,7 @@ class ProductCatalogController {
             });
 
             const savedProduct = await product.save();
-            res.status(201).json({ message: 'Create Successfully' });
+            res.status(201).json({ message: 'Product Create Successfully' });
         } catch (error) {
             next(error);
         }
