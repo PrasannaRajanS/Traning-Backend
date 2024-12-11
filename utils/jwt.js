@@ -29,3 +29,4 @@ const options = (user, res) => {
 };
 
 module.exports = options;
+
